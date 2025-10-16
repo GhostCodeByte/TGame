@@ -1,0 +1,21 @@
+{
+  "player": {
+    "name": "player",
+    "width": 3,
+    "height": 3,
+    "shape": [
+      ["\\", "O", "/"],
+      [" ", "Y", " "],
+      ["/", " ", "\\"]
+    ]
+  },
+  "enemy": {
+    "name": "enemy",
+    "width": 2,
+    "height": 2,
+    "shape": [
+      ["X", "X"],
+      ["X", "X"]
+    ]
+  }
+}
