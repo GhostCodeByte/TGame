@@ -14,8 +14,12 @@ export class Scene {
     );
   }
 
-  add(entity: GameObject) {
-    this.entities.push(entity);
+  public addGameObject(
+    mapCordX: number,
+    mapCordY: number,
+    assetNames: string[] = [],
+  ) {
+    this.entities.push(new GameObject(mapCordX, mapCordY, assetNames));
   }
 
   public fillBackground(char: string) {
