@@ -10,10 +10,20 @@ type Asset = {
 const assets: Record<string, Asset> = entity as Record<string, Asset>;
 
 export class GameObject {
-  mapCordX: number;
-  mapCordY: number;
   assetNames: string[];
   currentAssetIndex: number = 0;
+
+  mapCordX: number;
+  mapCordY: number;
+
+  velX: number = 0;
+  velY: number = 0;
+
+  accelerationX: number = 0;
+  accelerationY: number = 0;
+
+  mass: number = 1;
+  friction: number = 0.1;
 
   constructor(mapCordX: number, mapCordY: number, assetNames: string[] = []) {
     this.mapCordX = mapCordX;
@@ -27,6 +37,11 @@ export class GameObject {
   }
 
   update(delta: number) {
-    // Bewegung, Physik, AI etc.
+    this.velX += this.accelerationX * delta;
+    this.velY += this.accelerationY * delta;
+
+    // Apply friction
+    this.velX *= 1 - this.friction;
+    this.velY *= 1 - this.friction;
   }
 }

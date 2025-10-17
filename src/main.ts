@@ -1,5 +1,4 @@
 import GameEngine from "./logic/gameEngine.js";
-import { GameObject } from "./logic/entity.js";
 
 const viewWidth = 50;
 const viewHeight = 25;
