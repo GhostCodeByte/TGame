@@ -3,40 +3,42 @@ import { Renderer } from "./renderer.js";
 import { GameObject } from "./entity.js";
 
 class GameEngine {
-  private scene: Scene;
-  private renderer: Renderer;
+  private scene!: Scene;
+  public renderer: Renderer;
   private lastTime = 0;
   private fps = 0;
   private startTime: number | undefined;
   private fpsSum = 0;
   private fpsCount = 0;
 
-  constructor(
-    viewHeight: number,
-    viewWidth: number,
-    mapWidth: number,
-    mapHeight: number,
-  ) {
-    this.scene = new Scene(mapHeight, mapWidth); // Erstelle Scene mit Karte
-    this.scene.fillBackground("."); // Fülle Hintergrund mit Standardcharakter
-    this.renderer = new Renderer(viewHeight, viewWidth);
-    this.renderer.render(this.scene, 0, 0);
+  private frameUpdate?: (scene: Scene, delta: number) => void;
+  public setFrameUpdate(cb: (scene: Scene, delta: number) => void) {
+    this.frameUpdate = cb;
   }
 
-  // Füge Entities zur Scene hinzu (statt direkt in Engine)
+  constructor(viewWidth: number, viewHeight: number) {
+    this.renderer = new Renderer(viewWidth, viewHeight);
+  }
+
   public addEntity(entity: GameObject) {
     this.scene.add(entity);
   }
 
-  // Haupt-Update: Delegiere an Scene
+  public setScene(mapWidth: number, mapHeight: number) {
+    this.scene = new Scene(mapWidth, mapHeight);
+    this.scene.fillBackground(".");
+  }
+
   private update(delta: number) {
+    // Hook aus main.ts (z. B. Entities clearen/neu hinzufügen)
+    if (this.frameUpdate) this.frameUpdate(this.scene, delta);
+    // Normales Update der Entities
     this.scene.update(delta);
   }
 
   // Haupt-Render: Delegiere an Renderer
   private render(viewX: number, viewY: number) {
     this.renderer.render(this.scene, viewX, viewY);
-    // FPS-Anzeige (falls noch gewünscht – könnte in Renderer verschoben werden)
     const fpsElement = document.getElementById("fps")! as HTMLElement;
     fpsElement.innerText = `FPS: ${this.fps.toFixed(2)} | Entities: ${this.scene.entities.length}`;
   }
@@ -57,12 +59,15 @@ class GameEngine {
     this.update(delta);
     this.render(0, 0); // Beispiel-View-Position; anpassen je nach Kamera
 
-    if (time - this.startTime >= 60000) {
+    if (time - this.startTime >= 10000) {
       const averageFps = this.fpsSum / this.fpsCount;
-      console.log(`Average FPS over 60 seconds: ${averageFps.toFixed(2)}`);
-      return;
-    }
+      console.log(`Average FPS over last minute: ${averageFps.toFixed(2)}`);
 
+      // Reset für nächste Minute
+      this.startTime = time;
+      this.fpsSum = 0;
+      this.fpsCount = 0;
+    }
     requestAnimationFrame(this.gameLoop);
   };
 }

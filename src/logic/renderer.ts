@@ -8,17 +8,17 @@ export class Renderer {
   private ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
   private fpsElement = document.getElementById("fps")! as HTMLElement;
 
-  constructor(viewNumCharakterY: number, viewNumCharakterX: number) {
-    this.viewWidth = viewNumCharakterY;
-    this.viewHeight = viewNumCharakterX;
+  constructor(viewWidth: number, viewHeight: number) {
+    this.viewWidth = viewWidth;
+    this.viewHeight = viewHeight;
   }
 
   public render(scene: Scene, viewX: number, viewY: number) {
     const { visibleMap, visibleEntities } = scene.getViewPort(
       viewX,
       viewY,
-      this.viewHeight,
       this.viewWidth,
+      this.viewHeight,
     );
 
     // Zeichne die Karte
