@@ -7,10 +7,15 @@ export class Renderer {
   private canvas = document.getElementById("textCanvas") as HTMLCanvasElement;
   private ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
   private fpsElement = document.getElementById("fps")! as HTMLElement;
+  private bufferOld: string[][];
+  private bufferNew: string[][];
 
   constructor(viewWidth: number, viewHeight: number) {
     this.viewWidth = viewWidth;
     this.viewHeight = viewHeight;
+    this.bufferOld = Array(viewHeight).fill(null).map(() => Array(viewWidth).fill(""));
+    this.bufferNew = this.bufferOld
+    
   }
 
   public render(scene: Scene, viewX: number, viewY: number) {
@@ -20,26 +25,33 @@ export class Renderer {
       this.viewWidth,
       this.viewHeight,
     );
+    //Der alte frame wird in bufferOld geschrieben
+    this.bufferOld = this.bufferNew
 
-    // Zeichne die Karte
+    //schreibe die map in den Buffer
     for (let y = 0; y < visibleMap.length; y++) {
       for (let x = 0; x < visibleMap[y].length; x++) {
-        this.drawChar(x, y, visibleMap[y][x]);
+        this.bufferNew[y][x] = visibleMap[y][x];
       }
     }
 
-    // Zeichne die Entities
+    //schreibe Entitys in den Buffer
     for (const entity of visibleEntities) {
       for (let i = 0; i < entity.getCurrentAsset().height; i++) {
         for (let j = 0; j < entity.getCurrentAsset().width; j++) {
           const c = entity.getCurrentAsset().shape[i][j];
           if (c !== " ") {
-            this.drawChar(
-              entity.mapCordX - viewX + j,
-              entity.mapCordY - viewY + i,
-              c,
-            );
+            this.bufferNew[entity.mapCordY - viewY + j][entity.mapCordX - viewX + i] = c
           }
+        }
+      }
+    }
+
+    //schreibe aus dem buffer was sich geändert hat auf den screen
+    for (let y = 0; y < visibleMap.length; y++) {
+      for (let x = 0; x < visibleMap[y].length; x++) {
+        if (this.bufferNew[y][x] !== this.bufferOld[y][x]) {
+          this.drawChar(x, y, this.bufferNew[y][x])
         }
       }
     }
